@@ -44,7 +44,4 @@ unsigned moc(zbior_ary A);
 // Wynikiem funkcji jest Ary_q(A), czyli minimalna liczba parami rozlacznych ciagow arytmetycznych o roznicy q, ktorych suma jest zbior A.
 unsigned ary(zbior_ary A);
 
-//funkcja do testowania
-void print(zbior_ary A);
-
 #endif
