@@ -7,10 +7,9 @@ int q;
 
 zbior_ary ciag_arytmetyczny(int a, int Q, int b) {
 	q = Q;
-	zbior_ary X = {NULL, 0, 0};
-	X.prz = (przedzial*) malloc(16 * sizeof(przedzial));
+	zbior_ary X = {NULL, 0};
+	X.prz = (przedzial*) malloc(sizeof(przedzial));
 	X.rozmiar = 1;
-	X.pojemnosc = 16;
 	X.prz[0].a = a;
 	X.prz[0].b = b;
 	int r = ((a % Q) + Q) % Q;
@@ -24,7 +23,7 @@ zbior_ary singleton(int a) {
 
 unsigned moc(zbior_ary A) {
     long long wyn = 0;
-    for (int i = 0; i < (int)A.rozmiar; i++) {
+    for(int i = 0; i < (int)A.rozmiar; i++) {
         long long b = (long long)A.prz[i].b;
         long long a = (long long)A.prz[i].a;
             
@@ -66,7 +65,7 @@ bool nalezy(zbior_ary A, int b) {
     // idx to pierwszy element, że A.prz[i].r > res LUB
     // A.prz[idx].a >= b+1 ORAZ reszty sie zgadzają
     // nas może interesować element tuż przed nim
-    if (idx > 0) {
+    if(idx > 0) {
         idx--;
     }
 
@@ -78,16 +77,12 @@ bool nalezy(zbior_ary A, int b) {
 }
 
 void dodaj_przedzial(zbior_ary *C, int a, int b, int r) {
-    // sprawdzamy czy potrzebujemy więcej miejsca
-    if(C->rozmiar == C->pojemnosc) {
-
-        // podwajamy pojemność (lub zaczynamy od 16, jeśli była pusta)
-        unsigned nowa_pojemnosc = (C->pojemnosc == 0) ? 16 : C->pojemnosc * 2;
-        
-        przedzial* nowa_tablica = (przedzial*)realloc(C->prz, nowa_pojemnosc * sizeof(przedzial));
-        
-        C->prz = nowa_tablica;
-        C->pojemnosc = nowa_pojemnosc;
+    if(C->rozmiar == 0) {
+    	C->prz = (przedzial*) malloc(sizeof(przedzial));
+    } else {
+    	unsigned n = C->rozmiar;
+    	przedzial* pom_tab = (przedzial*) realloc(C->prz, (n + 1) * sizeof(przedzial));
+    	C->prz = pom_tab;
     }
 
     // mamy gwarantowane miejsce wiec dodajemy element
@@ -100,7 +95,7 @@ void dodaj_przedzial(zbior_ary *C, int a, int b, int r) {
 zbior_ary suma(zbior_ary A, zbior_ary B) {
 
 	// deklarujemy wynik C jako zbior pusty
-	zbior_ary C = {NULL, 0, 0};
+	zbior_ary C = {NULL, 0};
 
 	unsigned i = 0, j = 0; //wskaźniki na A, B
 
@@ -110,7 +105,7 @@ zbior_ary suma(zbior_ary A, zbior_ary B) {
 		// sprawdzamy czy A.prz[i].r == B.prz[j].r
 		// jeżeli nie to bierzemy przedział o mniejszym r
 		// jeżeli tak to bierzemy przedział o mniejszym początku
-		if (j >= B.rozmiar || (i < A.rozmiar &&
+		if(j >= B.rozmiar || (i < A.rozmiar &&
 		 (A.prz[i].r < B.prz[j].r ||
 		 (A.prz[i].r == B.prz[j].r && A.prz[i].a <= B.prz[j].a)))) {
 			aktu = A.prz[i++];
@@ -130,11 +125,10 @@ zbior_ary suma(zbior_ary A, zbior_ary B) {
         // sprawdzamy czy możemy scalic aktu i ostatni przedział w C
         if(ostatni->r == aktu.r && (long long)aktu.a <= (long long)ostatni->b + (long long)q) {
             // scalamy: wystarczy ewentualnie rozszerzyć koniec
-            if (aktu.b > ostatni->b) {
+            if(aktu.b > ostatni->b) {
                 ostatni->b = aktu.b;
             }
-        } 
-        else {
+        } else {
             // brak scalenia (inna reszta lub przerwa)
             // dodajemy aktu jako osobny przedział
             dodaj_przedzial(&C, aktu.a, aktu.b, aktu.r);
@@ -144,7 +138,7 @@ zbior_ary suma(zbior_ary A, zbior_ary B) {
 }
 
 zbior_ary roznica(zbior_ary A, zbior_ary B) {
-	zbior_ary C = {NULL, 0, 0};
+	zbior_ary C = {NULL, 0};
 
 	unsigned i = 0, j = 0; // wskaźniki na A, B
 
