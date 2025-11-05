@@ -89,7 +89,7 @@ void dodaj_przedzial(zbior_ary *C, int a, int b, int r) {
     C->prz[C->rozmiar].a = a;
     C->prz[C->rozmiar].b = b;
     C->prz[C->rozmiar].r = r;
-    C->rozmiar++; // zwiększamy liczbę używanych elementów
+    C->rozmiar++;
 }
 
 zbior_ary suma(zbior_ary A, zbior_ary B) {
