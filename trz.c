@@ -30,32 +30,28 @@ bool czy_juz_jest(int siec, int *nowe, int rozmiar, para *motel) {
     return false;
 }
 
-//funkcja znajduje trzy pierwsze motele roznych sieci
-bool policz_lewo(int *lewo, para *motel, int n) {
-	int licz = 0, i = 1;
-	while(licz < 3 && i <= n) {
-		if(motel[i].siec != motel[lewo[0]].siec && 
-			motel[i].siec != motel[lewo[1]].siec) {
-			lewo[licz] = i;
-			licz++;
+//funkcja pom do znajdywania skrajnych moteli
+bool znajdz_skrajne(int *wynik, para *motel, int poc, int kon, int krok) {
+	int licz = 0;
+	for(int i = poc; i != kon + krok; i += krok) {
+		if(licz >= 3) break;
+
+		if(motel[i].siec != motel[wynik[0]].siec &&
+			motel[i].siec != motel[wynik[1]].siec) {
+			wynik[licz++] = i;
 		}
-		i++;
 	}
-	return (licz < 3); // jesli true to znaczy ze nie istnieja motele 3 roznych sieci
+	return (licz < 3);
 }
 
-//funkcja znajduje trzy ostatnie motele roznych sieci
+// znajduje 3 motele roznych sieci najbardziej na lewo
+bool policz_lewo(int *lewo, para *motel, int n) {
+	return znajdz_skrajne(lewo, motel, 1, n, 1);
+}
+
+//znajduje 3 motele roznych sieci najbardziej na prawo
 bool policz_prawo(int *prawo, para *motel, int n) {
-	int licz = 0, i = n;
-	while(licz < 3 && i > 0) {
-		if(motel[i].siec != motel[prawo[0]].siec && 
-			motel[i].siec != motel[prawo[1]].siec) {
-			prawo[licz] = i;
-			licz++;
-		}
-		i--;
-	}
-	return (licz < 3); // jesli true to znaczy ze nie istnieja motele 3 roznych sieci
+	return znajdz_skrajne(prawo, motel, n, 1, -1);
 }
 
 int najdalsza_trojka(para *motel, int n) {
@@ -66,8 +62,12 @@ int najdalsza_trojka(para *motel, int n) {
 	int lewo[3] = {0, 0, 0}; // zbior 3 moteli roznych sieci najbardziej na lewo
 	int prawo[3] = {0, 0, 0}; // zbior 3 moteli roznych sieci najbardziej na prawo
 
+	//printf("Test\n");
+	//printf("%d\n", policz_prawo(prawo, motel, n));
+	//for(int i = 0; i < 3; i++) printf("%d ", prawo[i]);
 	if(policz_lewo(lewo, motel, n)) // wyznaczamy lewo
 		return 0;
+
 	if(policz_prawo(prawo, motel, n)) // wyznaczamy prawo
 		return 0;
 
@@ -91,15 +91,14 @@ int najdalsza_trojka(para *motel, int n) {
 	return wyn;
 }
 
-//funkcja oblicza tablice pref
-//pref[][i] = zbior 3 moteli roznych sieci bedacych na prefiksie [1...i-1] najblizej pozycji i 
-void policz_pref(int **pref, para *motel, int n) {
+//funkcja pom do liczenia tablicy pref i suf
+void policz_tablice(int **tab, para *motel, int poc, int kon, int krok) {
     int najblizsi[3] = {0, 0, 0}; // zbior ostatnio spotkanych 3 moteli roznych sieci
-    for (int i = 1; i <= n; i++) {
+    for (int i = poc; i != kon + krok; i += krok) {
     	// z definicji pref[][i] = najblizsi
-        pref[0][i] = najblizsi[0];
-        pref[1][i] = najblizsi[1];
-        pref[2][i] = najblizsi[2];
+        tab[0][i] = najblizsi[0];
+        tab[1][i] = najblizsi[1];
+        tab[2][i] = najblizsi[2];
 
         // aktualizujemy tablice najblizsi
         // mamy 4 kandydatow do tablicy najblizsi
@@ -107,7 +106,7 @@ void policz_pref(int **pref, para *motel, int n) {
         //tablica pomocnicza do wyznaczenia wlasciwej trojki moteli
         int nowe[3] = {0, 0, 0}, licz = 0;
         
-        for(int k=0; k<4; k++) {
+        for(int k = 0; k < 4; k++) {
             int kand = kandydaci[k];
             if(kand == 0) continue;
             //jezeli motel[kand] ma inna siec niz motele w tablicy nowe
@@ -122,35 +121,14 @@ void policz_pref(int **pref, para *motel, int n) {
     }
 }
 
+//funkcja oblicza tablice pref
+void policz_pref(int **pref, para *motel, int n) {
+	policz_tablice(pref, motel, 1, n, 1);
+}
+
 //funkcja oblicza tablice suf
-//suf[][i] = zbior 3 moteli roznych sieci bedacych na sufiksie [n...n-i+1] najblizej pozycji i 
 void policz_suf(int **suf, para *motel, int n) {
-    int najblizsi[3] = {0, 0, 0}; // zbior ostatnio spotkanych 3 moteli roznych sieci
-    for (int i = n; i >= 1; i--) {
-    	//z definicji suf = najblizsi
-        suf[0][i] = najblizsi[0];
-        suf[1][i] = najblizsi[1];
-        suf[2][i] = najblizsi[2];
-
-        //aktualizujemy tablice najblizsi
-        //mamy 4 kandydatow do tablicy najblizsi
-        int kandydaci[4] = {i, najblizsi[0], najblizsi[1], najblizsi[2]};
-        //tablica pomocnicza do wyznaczenia wlasciwej trojki moteli
-        int nowe[3] = {0, 0, 0}, licz = 0;
-
-        for(int k = 0; k < 4; k++) {
-            int kand = kandydaci[k];
-            if(kand == 0) continue; 
-            //jezeli motel[kand] ma inna siec niz motele w tablicy nowe
-            //oraz jesli w tablicy nowe sa mniej niz 3 motele 
-            //to dodajemy kandydata
-            if(!czy_juz_jest(motel[kand].siec, nowe, licz, motel) && licz < 3) {
-                nowe[licz++] = kand;
-            }
-        }
-        //przepisujemy wynik z tablicy pomocniczej
-        for(int k = 0; k < 3; k++) najblizsi[k] = nowe[k];
-    }
+	policz_tablice(suf, motel, n, 1, -1);
 }
 
 int najblizsza_trojka(para *motel, int n) {
