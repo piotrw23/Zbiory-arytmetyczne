@@ -62,8 +62,6 @@ int najdalsza_trojka(para *motel, int n) {
 	int lewo[3] = {0, 0, 0}; // zbior 3 moteli roznych sieci najbardziej na lewo
 	int prawo[3] = {0, 0, 0}; // zbior 3 moteli roznych sieci najbardziej na prawo
 
-	//printf("Test\n");
-	//printf("%d\n", policz_prawo(prawo, motel, n));
 	//for(int i = 0; i < 3; i++) printf("%d ", prawo[i]);
 	if(policz_lewo(lewo, motel, n)) // wyznaczamy lewo
 		return 0;
