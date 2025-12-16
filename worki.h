@@ -1,0 +1,58 @@
+#ifndef WORKI_H
+#define WORKI_H
+
+struct Lokacja;
+
+struct przedmiot {
+    // Wskaźniki listy dwukierunkowej
+    przedmiot *prev = nullptr;
+    przedmiot *next = nullptr;
+    
+    // Gdzie ten element aktualnie się znajduje
+    Lokacja *lokacja = nullptr;
+};
+
+struct worek : public przedmiot {
+    int id; // Nr worka
+    Lokacja *wnetrze = nullptr; // To, co jest w środku worka
+};
+
+// Nowy przedmiot na biurku
+przedmiot *nowy_przedmiot();
+
+// Nowy worek na biurku; otrzymuje kolejny numer, począwszy od 0.
+worek *nowy_worek();
+
+// Wkłada przedmiot co do worka gdzie.
+// Założenie: co i gdzie leżą na biurku.
+void wloz(przedmiot *co, worek *gdzie);
+
+// Wkłada worek co do worka gdzie.
+// Założenie: co i gdzie leżą na biurku.
+void wloz(worek *co, worek *gdzie);
+
+// Wyjmuje przedmiot p z worka i kładzie na biurku.
+// Założenie: Przedmiot p był w worku leżącym na biurku.
+void wyjmij(przedmiot *p);
+
+// Wyjmuje worek w z worka i kładzie na biurku.
+// Założenie: Worek w był w worku leżącym na biurku.
+void wyjmij(worek *w);
+
+// Wynik: numer worka, w którym znajduje się przedmiot p (-1 jeśli na biurku).
+int w_ktorym_worku(przedmiot *p);
+
+// Wynik: numer worka, w którym znajduje się worek w (-1 jeśli na biurku).
+int w_ktorym_worku(worek *w);
+
+// Wynik: liczba przedmiotów zawartych (bezpośrednio i pośrednio) w worku w
+int ile_przedmiotow(worek *w);
+
+// Cała zawartość worka w ląduje na biurku, a wszystko, co poza workiem w
+// znajdowało się bezpośrednio na biurku, ląduje wewnątrz worka w.
+void na_odwrot(worek *w);
+
+// Kończy i zwalnia pamięć
+void gotowe();
+
+#endif
